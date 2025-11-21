@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Gastos de Venta - Girona</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: white;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            overflow: hidden;
+        }
+
+        .header {
+            background: white;
+            color: #333;
+            padding: 40px 30px;
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin: 0 0 20px 0;
+            line-height: 1.3;
+        }
+
+        .header img {
+            height: 70px;
+            width: auto;
+            margin-top: 15px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .slider-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #e0e0e0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .campo-explicacion {
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+
+        button {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: bold;
+            padding: 18px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: white;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 40px 20px;
+            overflow-y: auto;
+            visibility: hidden;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: transform 0.4s ease-out, opacity 0.4s ease-out, visibility 0s 0.4s;
+        }
+
+        .modal.modal-visible {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(0);
+            transition: transform 0.4s ease-out, opacity 0.4s ease-out, visibility 0s 0s;
+        }
+
+        .modal-content {
+            width: 100%;
+            max-width: 500px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 30px;
+            border-radius: 12px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+        }
+
+        .modal-content h2 {
+            font-size: 24px;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        .resultado-item {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .resultado-destacado {
+            background: rgba(255, 255, 255, 0.25);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .aviso {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .agente-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 30px;
+            text-align: center;
+            color: #333;
+        }
+
+        .agente-imagen {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: block;
+            border: 3px solid #667eea;
+        }
+
+        .agente-card p {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        #whatsappBtn {
+            background-color: #25D366;
+            color: white;
+            font-weight: bold;
+            padding: 18px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            width: 100%;
+            max-width: 300px;
+            transition: background-color 0.3s ease;
+        }
+
+        #whatsappBtn:hover {
+            background-color: #20ba5a;
+        }
+
+        .close-x {
+            margin-top: 30px;
+            font-size: 40px;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .close-x:hover {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Calculadora<br>Gastos de Venta</h1>
+            <img src="https://raw.githubusercontent.com/botonescurso/calculadoras/main/ajuntament-girona.png" alt="Ajuntament de Girona" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/botonescurso/calculadoras/main/Fabian.jpg';">
+        </div>
+
+        <div class="content">
+            <div class="form-group">
+                <label>💰 Precio de venta (€)</label>
+                <div class="slider-value" id="precioVentaValue">300.000 €</div>
+                <input type="range" id="precioVenta" min="50000" max="2000000" step="10000" value="300000" oninput="updateValue('precioVenta', this.value)">
+                <p class="campo-explicacion">Precio total al que vendes la vivienda.</p>
+            </div>
+
+            <div class="form-group">
+                <label>📊 Valor catastral del suelo (€)</label>
+                <div class="slider-value" id="valorCatastralValue">50.000 €</div>
+                <input type="range" id="valorCatastral" min="10000" max="500000" step="5000" value="50000" oninput="updateValue('valorCatastral', this.value)">
+                <p class="campo-explicacion">Lo encuentras en el recibo del IBI. Es solo el valor del suelo, no de la construcción.</p>
+            </div>
+
+            <div class="form-group">
+                <label>📅 Años de propiedad</label>
+                <div class="slider-value" id="aniosPropiedadValue">10 años</div>
+                <input type="range" id="aniosPropiedad" min="1" max="50" step="1" value="10" oninput="updateValue('aniosPropiedad', this.value, ' años')">
+                <p class="campo-explicacion">Años que has sido propietario de la vivienda.</p>
+            </div>
+
+            <div class="form-group">
+                <label>💼 Comisión inmobiliaria (%)</label>
+                <div class="slider-value" id="comisionValue">3 %</div>
+                <input type="range" id="comision" min="0" max="10" step="0.5" value="3" oninput="updateValue('comision', this.value, ' %')">
+                <p class="campo-explicacion">Porcentaje que cobra la inmobiliaria sobre el precio de venta.</p>
+            </div>
+
+            <button onclick="calcularGastos()">Calcular Gastos</button>
+        </div>
+    </div>
+
+    <div class="modal" id="modalResultado">
+        <div class="modal-content">
+            <h2>Resultado estimado</h2>
+            <div id="contenidoResultado"></div>
+            <div class="aviso">
+                ⚠️ Estos son datos estimados. Consulta con un profesional para confirmar tu situación.
+            </div>
+        </div>
+
+        <div class="agente-card">
+            <img src="https://raw.githubusercontent.com/botonescurso/calculadoras/main/Fabian.jpg" alt="Fabián Caamaño" class="agente-imagen">
+            <p>¿Quieres que lo revisemos contigo? Escríbenos por WhatsApp 👇</p>
+            <a id="whatsappBtn" href="#" target="_blank">Abrir WhatsApp ➚</a>
+        </div>
+
+        <span class="close-x" onclick="cerrarModal()">×</span>
+    </div>
+
+    <script>
+        function updateValue(id, value, suffix = ' €') {
+            const numValue = parseFloat(value);
+            if (suffix === ' €') {
+                document.getElementById(id + 'Value').textContent = numValue.toLocaleString('es-ES') + suffix;
+            } else {
+                document.getElementById(id + 'Value').textContent = numValue + suffix;
+            }
+        }
+
+        function calcularGastos() {
+            const precioVenta = parseFloat(document.getElementById("precioVenta").value) || 0;
+            const valorCatastral = parseFloat(document.getElementById("valorCatastral").value) || 0;
+            const aniosPropiedad = parseInt(document.getElementById("aniosPropiedad").value) || 1;
+            const comisionPct = parseFloat(document.getElementById("comision").value) || 0;
+
+            // 1. Comisión inmobiliaria
+            const comision = precioVenta * (comisionPct / 100);
+
+            // 2. Plusvalía municipal (estimación)
+            let coefPlusvalia = 0.03; // Coeficiente promedio por año
+            if (aniosPropiedad <= 5) coefPlusvalia = 0.03;
+            else if (aniosPropiedad <= 10) coefPlusvalia = 0.025;
+            else coefPlusvalia = 0.02;
+            
+            const baseImponiblePlusvalia = valorCatastral * coefPlusvalia * aniosPropiedad;
+            const plusvalia = baseImponiblePlusvalia * 0.30; // Tipo aprox Girona
+
+            // 3. Notaría (escritura cancelación si hay hipoteca)
+            const notaria = 300; // Estimación fija
+
+            // 4. Registro (cancelación de hipoteca si existe)
+            const registro = 200; // Estimación fija
+
+            // 5. Certificado energético
+            const certificadoEnergetico = 150;
+
+            // 6. Cédula de habitabilidad (Cataluña)
+            const cedulaHabitabilidad = 100;
+
+            // 7. Gestoría (opcional)
+            const gestoria = 400;
+
+            // Total gastos
+            const totalGastos = comision + plusvalia + notaria + registro + certificadoEnergetico + cedulaHabitabilidad + gestoria;
+
+            let resultadoHTML = `
+                <div class="resultado-item">
+                    <strong>Comisión inmobiliaria (${comisionPct}%)</strong><br>
+                    ${comision.toLocaleString('es-ES')} €
+                </div>
+                <div class="resultado-item">
+                    <strong>Plusvalía municipal (estimada)</strong><br>
+                    ${plusvalia.toLocaleString('es-ES')} €
+                </div>
+                <div class="resultado-item">
+                    <strong>Notaría (cancelación)</strong><br>
+                    ${notaria.toLocaleString('es-ES')} €
+                </div>
+                <div class="resultado-item">
+                    <strong>Registro (cancelación)</strong><br>
+                    ${registro.toLocaleString('es-ES')} €
+                </div>
+                <div class="resultado-item">
+                    <strong>Certificado energético</strong><br>
+                    ${certificadoEnergetico.toLocaleString('es-ES')} €
+                </div>
+                <div class="resultado-item">
+                    <strong>Cédula habitabilidad</strong><br>
+                    ${cedulaHabitabilidad.toLocaleString('es-ES')} €
+                </div>
+                <div class="resultado-item">
+                    <strong>Gestoría</strong><br>
+                    ${gestoria.toLocaleString('es-ES')} €
+                </div>
+                <div class="resultado-destacado">
+                    Total gastos estimados:<br>
+                    ${totalGastos.toLocaleString('es-ES', {maximumFractionDigits: 0})} €
+                </div>
+            `;
+
+            document.getElementById("contenidoResultado").innerHTML = resultadoHTML;
+            const mensaje = encodeURIComponent(`Hola, he calculado mis gastos de venta en Girona. Total estimado: ${totalGastos.toLocaleString('es-ES')} €. ¿Podéis ayudarme?`);
+            document.getElementById("whatsappBtn").href = `https://wa.me/34633105305?text=${mensaje}`;
+            document.getElementById("modalResultado").classList.add('modal-visible');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function cerrarModal() {
+            document.getElementById("modalResultado").classList.remove('modal-visible');
+            document.body.style.overflow = '';
+        }
+    </script>
+</body>
+</html>
